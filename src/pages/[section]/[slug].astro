@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { sections } from '../../site.config';
+import { formatDate } from '../../lib/writing';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('writing');
+  return entries.map((entry) => ({
+    params: { section: sections[entry.data.kind].path, slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+<Base lang="ko" title={entry.data.title}>
+  <article>
+    <h1>{entry.data.title}</h1>
+    <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date, 'ko')}</time>
+    <Content />
+  </article>
+</Base>

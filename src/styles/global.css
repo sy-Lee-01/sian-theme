@@ -1,0 +1,42 @@
+/* 2단계: 구조 확인용 최소 스타일. 서체·색은 5단계에서 정한다. */
+:root {
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --bg: #ffffff;
+  --link: #1a1a1a;
+  --measure: 38rem;
+  font-family: system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --text: #e8e8e8; --muted: #9a9a9a; --bg: #161616; --link: #e8e8e8; }
+}
+html[lang="ko"] { word-break: keep-all; }
+
+body { max-width: var(--measure); margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+a { color: var(--link); text-underline-offset: 0.2em; }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+.site-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-bottom: 3rem; }
+.site-header nav { display: flex; gap: 1rem; }
+.site-header nav a { text-decoration: none; color: var(--muted); }
+.site-header nav a[aria-current="page"] { color: var(--text); }
+.site-name { font-weight: 600; text-decoration: none; }
+
+h1 { font-size: 1.5rem; margin: 0 0 1.5rem; }
+h2 { font-size: 1.1rem; margin: 2.5rem 0 1rem; }
+time, .venue, .period { color: var(--muted); font-size: 0.9rem; }
+article time { display: block; margin: -1rem 0 2rem; }
+
+.records, .writing-list { list-style: none; padding: 0; margin: 0; }
+.records li { margin-bottom: 1.25rem; }
+.records p { margin: 0.2rem 0 0; color: var(--muted); }
+.venue { margin-left: 0.5rem; }
+.period { display: block; }
+.writing-list li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; }
+.empty { color: var(--muted); }
+
+.site-footer { display: flex; gap: 1rem; margin-top: 4rem; font-size: 0.9rem; }
+.site-footer a { color: var(--muted); }

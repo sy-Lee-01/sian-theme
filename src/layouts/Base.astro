@@ -1,0 +1,43 @@
+---
+import { site, sections } from '../site.config';
+import '../styles/global.css';
+
+interface Props {
+  lang: 'en' | 'ko';
+  title?: string;
+}
+const { lang, title } = Astro.props;
+const pageTitle = title ? `${title} — ${site.name}` : site.name;
+const path = Astro.url.pathname;
+const nav = [
+  ...Object.values(sections).map((s) => ({ href: `/${s.path}/`, label: s.title })),
+  { href: '/cv/', label: 'CV' },
+];
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={site.description} />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="/" class="site-name">{site.name}</a>
+      <nav aria-label="Main">
+        {nav.map((item) => (
+          <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      {site.links.map((l) => <a href={l.href}>{l.label}</a>)}
+    </footer>
+  </body>
+</html>

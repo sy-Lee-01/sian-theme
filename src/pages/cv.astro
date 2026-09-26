@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PublicationList from '../components/PublicationList.astro';
+
+const activities = await getCollection('activities');
+// 볼트에 적힌 섹션 순서를 그대로 유지
+const groups = new Map<string, typeof activities>();
+for (const a of activities) {
+  if (!groups.has(a.data.section)) groups.set(a.data.section, []);
+  groups.get(a.data.section)!.push(a);
+}
+---
+<Base lang="en" title="CV">
+  <h1>CV</h1>
+  {[...groups].map(([section, items]) => (
+    <section>
+      <h2>{section}</h2>
+      <ul class="records">
+        {items.map(({ data }) => (
+          <li>
+            <span class="period">{data.period}</span>
+            {data.link ? <a href={data.link}>{data.text}</a> : <span>{data.text}</span>}
+            {data.description && <p>{data.description}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+  <PublicationList />
+</Base>

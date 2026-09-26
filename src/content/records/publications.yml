@@ -1,0 +1,15 @@
+- id: pub-1
+  title: Example Paper Title
+  link: https://example.com
+  description: One-line description of the paper.
+  venue: CHI 2025
+- id: pub-2
+  title: Example Paper Title
+  link: https://example.com
+  description: One-line description of the paper.
+  venue: CHI 2026
+- id: pub-3
+  title: Another Example Paper
+  link: https://example.com
+  description: One-line description.
+  venue: CSCW 2025

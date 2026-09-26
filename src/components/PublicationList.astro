@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+const pubs = await getCollection('publications');
+---
+{pubs.length > 0 && (
+  <section>
+    <h2>Publications</h2>
+    <ul class="records">
+      {pubs.map(({ data }) => (
+        <li>
+          <a href={data.link}>{data.title}</a>
+          <span class="venue">{data.venue}</span>
+          <p>{data.description}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

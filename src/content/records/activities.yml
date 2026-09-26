@@ -1,0 +1,16 @@
+- id: act-1
+  section: Education
+  period: 2024–2026
+  text: M.S. in HCI, Example University
+  description: One-line description.
+- id: act-2
+  section: Experience
+  period: "2025"
+  text: Research Intern, Example Lab
+  description: One-line description.
+  link: https://example.com
+- id: act-3
+  section: Talks
+  period: "2026"
+  text: Example Talk Title, Example Venue
+  description: One-line description.
