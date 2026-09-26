@@ -9,7 +9,7 @@ const OUT = {
   writing: path.join(ROOT, 'src/content/writing'),
   records: path.join(ROOT, 'src/content/records'),
   about: path.join(ROOT, 'src/content/about.md'),
-  media: path.join(ROOT, 'public/media'),
+  media: path.join(ROOT, 'src/content/media'),
 };
 const sections = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/sections.json'), 'utf8'));
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -92,39 +92,43 @@ for (const d of docs) {
 
 // 노트 이름 → 공개 주소 (Obsidian처럼 대소문자 무시)
 const published = new Map(
-  docs.map((d) => [path.basename(d.file, '.md').toLowerCase(), `/${sections[d.kind]?.path}/${d.slug}/`]),
+  docs.map((d) => [path.basename(d.file, '.md').toLowerCase(), `${sections[d.kind]?.path}/${d.slug}/`]),
 );
 const assetFiles = walk(ASSETS);
 const media = new Map(); // 원본 경로 → 사이트 경로
 
-function useImage(target, from) {
+function useImage(target, from, imgDir) {
   const base = path.basename(decodeURIComponent(target.split('|')[0].trim()));
   const found = assetFiles.find((f) => path.basename(f) === base);
   if (!found) {
     fail(from, `이미지 "${base}"가 me/assets/에 없습니다 (assets 밖의 파일은 공개하지 않습니다)`);
     return '';
   }
-  const url = `/media/${encodeURIComponent(base)}`;
+  const url = `${imgDir}${encodeURIComponent(base)}`;
   media.set(found, base);
   return url;
 }
 
-function transform(body, from) {
+// 본문 속 링크와 이미지는 상대 경로로 쓴다. 그래야 github.io 하위 경로에서도,
+// 도메인을 연결한 뒤에도 그대로 동작한다.
+//   up: 이 페이지 주소에서 사이트 루트까지 (글 '../../', 홈 '')
+//   imgDir: 이 파일에서 src/content/media 까지 (Astro가 이미지를 최적화해 준다)
+function transform(body, from, up, imgDir) {
   let text = stripComments(body);
   // ![[image.png]] 임베드
   text = text.replace(/!\[\[([^\]]+)\]\]/g, (_, target) => {
-    if (IMAGE.test(target.split('|')[0].trim())) return `![](${useImage(target, from)})`;
+    if (IMAGE.test(target.split('|')[0].trim())) return `![](${useImage(target, from, imgDir)})`;
     return ''; // 노트 임베드는 공개하지 않음
   });
   // ![alt](assets/x.png) 형태의 마크다운 이미지
-  text = text.replace(/!\[([^\]]*)\]\((?!https?:)([^)]+)\)/g, (_, alt, target) => `![${alt}](${useImage(target, from)})`);
+  text = text.replace(/!\[([^\]]*)\]\((?!https?:)([^)]+)\)/g, (_, alt, target) => `![${alt}](${useImage(target, from, imgDir)})`);
   // [[노트]], [[노트|별칭]], [[노트#제목]]
   text = text.replace(/\[\[([^\]]+)\]\]/g, (_, inner) => {
     const [target, alias] = inner.split('|');
     const note = target.split('#')[0].trim();
     const label = (alias ?? note).trim();
     const url = published.get(path.basename(note).toLowerCase());
-    return url ? `[${label}](${url})` : label; // 비공개 노트는 평문으로
+    return url ? `[${label}](${up}${url})` : label; // 비공개 노트는 평문으로
   });
   return text.replace(/\n{3,}/g, '\n\n').trim() + '\n';
 }
@@ -132,7 +136,7 @@ function transform(body, from) {
 const writingOut = new Map();
 for (const d of docs) {
   const fm = toYaml({ kind: d.kind, title: d.title, date: d.date }).trim();
-  writingOut.set(`${d.slug}.md`, `---\n${fm}\n---\n${transform(d.body, d.name)}`);
+  writingOut.set(`${d.slug}.md`, `---\n${fm}\n---\n${transform(d.body, d.name, '../../', '../media/')}`);
 }
 
 // ---------- 2. about ----------
@@ -140,7 +144,7 @@ let aboutOut = '';
 const aboutFile = path.join(ME, 'about.md');
 if (fs.existsSync(aboutFile)) {
   const { data, body } = readNote(aboutFile);
-  if (data.publish === true) aboutOut = transform(body, 'me/about.md');
+  if (data.publish === true) aboutOut = transform(body, 'me/about.md', '', './media/');
 }
 
 // ---------- 3. 레코드 ----------

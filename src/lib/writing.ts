@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import { sections, type Kind } from '../site.config';
+import { url } from './url';
 
 export async function getWriting(kind: Kind) {
   const all = await getCollection('writing', (e) => e.data.kind === kind);
@@ -7,7 +8,7 @@ export async function getWriting(kind: Kind) {
 }
 
 export function writingUrl(kind: Kind, id: string) {
-  return `/${sections[kind].path}/${id}/`;
+  return url(`/${sections[kind].path}/${id}/`);
 }
 
 export function formatDate(date: Date, lang: 'ko' | 'en') {

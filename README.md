@@ -24,3 +24,8 @@ git diff                     # 무엇이 공개되는지 확인
 ```
 
 스크립트는 검사를 모두 통과해야만 파일을 쓰고, git은 건드리지 않는다.
+
+## 배포
+
+`main`에 푸시하면 GitHub Actions가 빌드해 GitHub Pages에 올린다 (`.github/workflows/deploy.yml`).
+사이트 주소는 `astro.config.mjs`의 `SITE`, `BASE` 두 줄로 정한다.
